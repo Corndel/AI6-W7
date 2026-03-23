@@ -37,6 +37,10 @@ WandB is the production-grade moment. By the end of the session every learner ha
 | 15:00 | Break | | |
 | 15:10 | Section 8 | Wrap-up questions | These are conversation starters, not written tasks. Aim for the whole group to hear different answers to question 3 (feature removal justification). |
 | 15:40 | Close | | Remind learners their WandB project is permanent evidence. Encourage them to add it to their learning journal. |
+| 15:40 | Section 9 | WandB model registration | Check everyone has a model saved to disk before moving to FastAPI |
+| 16:00 | Section 10 | FastAPI wrapper | They write app.py and see the structure. Do not spend time on Kubernetes theory unless asked. |
+| 16:25 | Section 11 | Model card | The most reflective part of the day. Give it time. |
+| 16:45 | Close | | Model card + WandB project are portfolio evidence. Learning journal. |
 
 ---
 
@@ -63,13 +67,41 @@ The default is not a justification. Ask: what does a false negative mean for an 
 **Learner wants to keep Age in the model**
 Do not override them. Ask them to document the reasoning in the code comment and make sure they can answer question 3 in the wrap-up. The point is the reasoning, not the specific feature list.
 
+**joblib or fastapi not installed**
+The setup cell installs everything. If a learner skipped the setup cell, ask them to run it first. If it fails, the Codespace may not have network access: `pip install joblib fastapi uvicorn pydantic --break-system-packages`.
+
+**app.py column mismatch error**
+The app.py is generated using the FEATURES_TO_REMOVE list from the notebook. If a learner changed that list and then ran the app.py cell without updating, the columns will not match the saved model. Ask them to rerun the app.py writer cell.
+
+**Model card feels overwhelming**
+Tell learners to fill in the performance table first using WandB numbers, then the feature removal section using what they already decided. The rest follows naturally. They do not need to write perfect prose: bullet points in the limitation and risk sections are fine.
+
 ---
 
 ## KSB coverage
+Primary KSBs are those most directly and substantially evidenced by work produced in this workshop. Secondary KSBs are reinforced here but were introduced earlier or will be revisited in later units.
 
-| KSB | Where it appears |
-|:--|:--|
-| K26: ethical aspects of data and ML | Sections 5, 6, and 8; DPIA and accountability collapsibles |
-| B4: acts with integrity | Threshold justification (Section 4); feature removal reasoning (Section 6) |
-| K7: performance evaluation | Sections 2, 3, and 4; WandB dashboard review |
-| S11: data analysis and model development | All coding sections |
+### Primary KSBs
+**These require the most focus during delivery and assessment.**
+
+| KSB | Description | Where evidenced |
+|:--|:--|:--|
+| **K7** | Performance metric selection in business context | Accuracy trap, F1 vs recall, threshold justification (Sections 2-4) |
+| **K19** | Problem-solving via test data analysis including edge-case data | Stress-testing with real test profiles and counterfactual reasoning (Section 12) |
+| **S11** | Regulatory, legal, ethical and governance issues at each stage | Feature selection, DPIA, Equality Act, throughout Sections 5-14 |
+| **S14** | Analyse test data, interpret results, evaluate solution suitability | Confusion matrix, ROC AUC, threshold table, stress-test profiles (Sections 2-4, 12) |
+| **S20** | Minimise algorithmic bias | SHAP analysis, feature removal, documented in model card (Sections 5-6, 11) |
+| **B4** | Acts with integrity, legal and ethical requirements | Threshold justification, feature removal, accountability questions throughout |
+| **B5** | Operates in technical complexity and uncertainty | Borderline threshold decision, stress-test edge cases, ROC AUC calibration |
+
+### Secondary KSBs
+Reinforcement of ideas introduced in earlier units or revisited in later ones.
+
+| KSB | Description | Where evidenced |
+|:--|:--|:--|
+| K5 | ML methods and experiment tracking tools | XGBoost throughout; WandB logging and model registration (Sections 3-9) |
+| K29 | Own role in relation to organisational governance, legal and ethical practice | Handoff discussion, accountability wrap-up, model card (Sections 10b, 13, 14) |
+| S5 | Create and deploy models | FastAPI wrapper, joblib model saving (Sections 9-10) |
+| S6 | Document model lifecycle assets | WandB run history, model card, app.py (Sections 9, 11) |
+| S28 | Produce and maintain technical documentation for the data product | Model card completed with real results (Section 11) |
+| S29 | Create reports and presentations for stakeholder approval and handover | Three-slide executive summary, handoff discussion (Sections 13, 14) |

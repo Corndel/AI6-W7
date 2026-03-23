@@ -1,6 +1,6 @@
 # =============================================================================
 #
-#   🏢  Unit 7W — Production-Grade Classification in Action
+#   🏢  Unit 7W : Production-Grade Classification in Action
 #   📦  Helper functions for the HR attrition notebook
 #
 # =============================================================================
@@ -136,7 +136,7 @@ def plot_shap_values(model, X_test, max_display=15):
         max_display=max_display,
         show=False,
     )
-    plt.title('SHAP feature importance — contribution to attrition prediction',
+    plt.title('SHAP feature importance : contribution to attrition prediction',
               fontsize=12, pad=12)
     plt.tight_layout()
     plt.show()
@@ -271,11 +271,13 @@ def plot_class_distribution(df, target='Attrition'):
     """
     Bar chart showing the class distribution in the dataset.
     """
-    counts = (df[target] == 'Yes').sum(), (df[target] == 'No').sum()
-    if df[target].dtype != object:
+    # Handle both string ('Yes'/'No') and numeric (1/0) encoded targets
+    if set(df[target].dropna().unique()).issubset({'Yes', 'No'}):
+        counts = (df[target] == 'Yes').sum(), (df[target] == 'No').sum()
+    else:
         counts = (df[target] == 1).sum(), (df[target] == 0).sum()
 
-    rate = counts[0] / len(df)
+    rate = counts[0] / len(df) if len(df) > 0 else 0
 
     fig, ax = plt.subplots(figsize=(6, 4))
     bars = ax.bar(['Left', 'Stayed'], counts,
@@ -284,7 +286,7 @@ def plot_class_distribution(df, target='Attrition'):
         ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 5,
                 str(val), ha='center', fontsize=11, fontweight='bold')
     ax.set_ylabel('Employees')
-    ax.set_title(f'Class distribution  —  {rate:.1%} attrition rate',
+    ax.set_title(f'Class distribution: {rate:.1%} attrition rate',
                  fontsize=12, fontweight='bold')
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
