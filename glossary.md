@@ -55,6 +55,8 @@ A single number summarising how well a classifier separates the two classes acro
 
 0.5 means random. 1.0 means perfect. In practice, anything above 0.7 is considered moderate for most real-world problems. What counts as good depends on the domain and on what you are comparing against.
 
+_Fun fact: The Receiver Operating Characteristic (ROC) curve is named for its origin in World War II, where it was used to analyse how well radar receivers and their operators could distinguish enemy aircraft from background noise_
+
 ---
 
 ### Precision
