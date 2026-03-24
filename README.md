@@ -1,7 +1,7 @@
 # Workshop 7: Production Grade Classification
 
 **Corndel AI6 Level 6 ML Engineer Apprenticeship**
-Unit 7: Advanced Modelling for Complex Problems
+Unit 7: Supervised Machine Learning
 
 ---
 
