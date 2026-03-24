@@ -24,7 +24,7 @@ WandB tracks every model you train. By the end of the session you will have a da
 
 ## On the day: where the WandB prompt appears
 
-When you run the WandB login cell, the prompt does not appear inside the notebook. It appears in the **search bar at the top of the Codespaces window** — the bar that normally shows the file name.
+When you run the WandB login cell, the prompt does not appear inside the notebook. It appears in the **search bar at the top of the Codespaces window** : the bar that normally shows the file name.
 
 When it appears:
 
