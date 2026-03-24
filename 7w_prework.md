@@ -18,13 +18,20 @@ WandB tracks every model you train. By the end of the session you will have a da
 
 **Step 3.** Scroll to the **API keys** section and click **New key**. Give it any name.
 
-**Step 4.** Copy the key immediately and paste it somewhere safe. **You can only see the key once.** If you lose it you can create a new one, but it is easier not to.
+**Step 4.** Copy the key immediately and paste it somewhere safe. **You can only see the key once.**
 
 ---
 
-## On the day
+## On the day: where the WandB prompt appears
 
-Open the Codespace from the repo. When you run the setup cell, an input box will appear asking for your API key. Paste it there and press Enter. Your key is never saved to the notebook.
+When you run the WandB login cell, the prompt does not appear inside the notebook. It appears in the **search bar at the top of the Codespaces window** — the bar that normally shows the file name.
+
+When it appears:
+
+1. Select option **(2) Use an existing W&B account**
+2. Paste your API key when asked
+
+See `wandb_login_location.png` in the repo for a screenshot showing exactly where to look.
 
 ---
 
