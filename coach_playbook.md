@@ -4,6 +4,18 @@
 
 ---
 
+## About the two notebook versions
+
+The repo contains two notebook files.
+
+**`7w_hr_attrition.ipynb`** is the learner version. All code cells are clean with no outputs. The four uncomment tasks have all three options commented out : learners must identify and uncomment the correct line themselves. There are no answers given away in comments.
+
+**`7w_hr_attrition_COACH.ipynb`** is the coach reference version. It contains the outputs from a full executed run, showing expected metric values, confusion matrices, WandB logging confirmations, stress-test probabilities, and risk tier counts. Use this to check what correct output looks like before the session, and to verify your own environment is working.
+
+Do not share the coach version with learners.
+
+---
+
 ## Delivery notes
 
 This workshop requires no slides. Do not prepare a deck. Everything the learner needs is in the notebook and the supporting files in the repo.
