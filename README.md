@@ -23,6 +23,7 @@ Every decision is logged to WandB. By the end of the session each learner has a 
 | `glossary.md` | Definitions for SHAP, SMOTE, DPIA, ROC AUC, the Equality Act, and other terms used in the notebook. |
 | `coach_playbook.md` | Timings, pedagogy intent, and troubleshooting for coaches. |
 | `7w_prework.md` | Pre-work instructions for learners. Send this before the session. |
+| `GOING_FURTHER.md` | Learners who finish early, encounter a break, or crave more reading, are encouraged to look here |
 
 ---
 
