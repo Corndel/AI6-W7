@@ -169,4 +169,4 @@ For attrition prediction: use both ROC AUC and PR AUC during development. Presen
 
 - Deepchecks glossary: [PR AUC](https://deepchecks.com/glossary/pr-auc/) : clear and concise, the source this document builds on
 - Scikit-learn documentation: [sklearn.metrics.average_precision_score](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.average_precision_score.html)
-- Davis and Goadrich (2006): *The Relationship Between Precision-Recall and ROC Curves* : the original paper establishing why PR curves are more informative for imbalanced problems
+- Davis and Goadrich (2006): *The Relationship Between Precision-Recall and ROC Curves* : the original paper establishing why PR curves are more informative for imbalanced problems, can be found [HERE](https://ftp.cs.wisc.edu/machine-learning/shavlik-group/davis.icml06.pdf)(accessed April 2026).
