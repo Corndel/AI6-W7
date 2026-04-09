@@ -143,18 +143,15 @@ The second number looks worse. But ask what a useless model would score on each 
 
 A model that predicts the majority class every time (stayed, stayed, stayed, for every employee) scores around 0.5 on ROC AUC. Not great, but not obviously broken. It looks like it has learned something.
 
-The same model scores 0.146 on PR AUC. That number will look familiar: it is the attrition rate in your dataset. This is not a coincidence, and it is worth understanding why.
+Your model scored 0.275 on the PR scale. A useless model would score 0.146 on the same scale. To understand why the useless model lands at exactly 0.146, imagine setting your threshold very low, so the model flags every employee as at risk. Recall is 1.0: you caught everyone who left. But precision is just 0.146: only 14.6% of the people you flagged actually left, because that is all there were. Now raise the threshold so high that the model flags nobody. Recall drops to 0. Precision is undefined. Everywhere in between, precision averages out to roughly the proportion of positives in the dataset, because that is the rate at which you encounter genuine cases no matter where you draw the line. The area under a curve that hovers around that proportion is the proportion itself.
 
-Imagine setting your threshold very low, so the model flags every employee as at risk. Recall is 1.0: you caught everyone who left. But precision is just 0.146: only 14.6% of the people you flagged actually left, because that is all there were. Now raise the threshold so high that the model flags nobody. Recall drops to 0. Precision is undefined. Everywhere in between, precision averages out to roughly the proportion of positives in the dataset, because that is the rate at which you encounter genuine cases no matter where you draw the line.
+In other words: the PR AUC of a useless model is always equal to the class prevalence. For your dataset, that is 0.146. The baseline is built into the data itself, not into an arbitrary convention like 0.5. This makes PR AUC unusually honest. You do not need to run an experiment to know what random performance looks like. You just look at how rare the positive class is.
 
-The area under a curve that hovers around 0.146 across all thresholds is 0.146. So a model that has learned nothing about who is actually at risk will score exactly the attrition rate on the PR scale. The baseline is built into the data itself.
+And now you can see that the "relative" floor is different. ROC AUC runs from 0.5 to 1.0. PR AUC runs from 0.146 to 1.0. The scales are not the same length. So, look at where your model sits on each one:
+On the ROC scale, your model scores 0.702. The distance from floor to perfect is 0.5. Your model has covered 0.202 of that distance: about 40% of the way.
+On the PR scale, your model scores 0.275. The distance from floor to perfect is 0.854. Your model has covered 0.129 of that distance: about 15% of the way.
 
-This makes PR AUC unusually honest. You do not need to run an experiment to know what random performance looks like. You just look at how rare the positive class is.
-
-So the relative "floor" is different. ROC AUC runs from 0.5 (useless) to 1.0 (perfect). PR AUC runs from 0.146 (useless) to 1.0 (perfect).
-Your model scores 0.702 on a scale where the floor is 0.5. Your model scores 0.275 on a scale where the floor is 0.146. Relative to their respective floors, those two numbers are telling roughly the same story: about 1.9 times better than random. But the PR scale makes the remaining gap to perfect much more visible, and it does so without letting the majority class absorb the blame for the minority class going undetected.
-That is what a ROC AUC of 0.70 actually means when only 15% of the dataset is positive.
-
+The improvement over random is real, roughly 1.9 times on both scales. But the PR scale shows clearly that most of the distance between a useless classifier and a genuinely useful one has not been covered yet. ROC AUC at 0.702 did not show you that, because it was absorbing the majority class into the calculation and smoothing over the gap. And that is what a ROC AUC of 0.70 actually means when only 15% of the dataset is positive!
 
 ---
 
