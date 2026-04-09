@@ -155,9 +155,9 @@ The improvement over random is real, roughly 1.9 times on both scales. **But the
 
 ---
 
-## What the limitations actually mean
+## Limitations to keep in mind
 
-**No universal baseline.** A PR AUC of 0.40 means different things on different datasets. On your attrition data with ~15% positives, 0.40 is well above random. On a fraud dataset with 0.1% positives, a baseline of 0.001 means 0.40 would be extraordinary. You always need to state the class prevalence alongside the PR AUC score.
+**The baseline varies by dataset.** You now know that the PR AUC baseline for a useless model is always equal to the class prevalence. On your attrition data that is 0.146, so a PR AUC of 0.275 is meaningful. On a fraud dataset with 0.1% positive cases, the baseline would be 0.001, and a PR AUC of 0.40 would be extraordinary. On a balanced dataset with 50% positives, the baseline is 0.5, and PR AUC and ROC AUC become more comparable. The number means nothing without knowing the prevalence, so always state both together.
 
 **Sensitive to class distribution.** If your attrition rate changes over time (a recession, a new pay policy, a wave of resignations), the PR AUC of the same model will change even if the model itself has not changed. This is not a bug: it is the metric correctly reflecting that the problem has become harder or easier. But it means you cannot compare PR AUC values across different time periods without accounting for prevalence.
 
