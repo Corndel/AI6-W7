@@ -143,7 +143,7 @@ The second number looks worse. But ask what a useless model would score on each 
 
 A model that predicts the majority class every time (stayed, stayed, stayed, for every employee) scores around 0.5 on ROC AUC. Not great, but not obviously broken. It looks like it has learned something.
 
-Your model scored 0.275 on the PR scale. A useless model would score 0.146 on the same scale. To understand why the useless model lands at exactly 0.146, imagine setting your threshold very low, so the model flags every employee as at risk. Recall is 1.0: you caught everyone who left. But precision is just 0.146: only 14.6% of the people you flagged actually left, because that is all there were. Now raise the threshold so high that the model flags nobody. Recall drops to 0. Precision is undefined. Everywhere in between, precision averages out to roughly the proportion of positives in the dataset, because that is the rate at which you encounter genuine cases no matter where you draw the line. The area under a curve that hovers around that proportion is the proportion itself.
+Your model scored 0.275 on the PR scale. A useless model would score 0.146 on the same scale. To understand why the useless model lands at exactly 0.146, imagine setting your threshold very low, so the model flags every employee as at risk. Recall is 1.0: you caught everyone who left. But precision is just 0.146: only 14.6% of the people you flagged actually left, because that is all there were. Now raise the threshold so high that the model flags nobody. Recall drops to 0. Precision is undefined. Everywhere in between, precision averages out to roughly the proportion of positives in the dataset, because that is the rate at which you encounter genuine cases no matter where you draw the line. 
 
 In other words: the PR AUC of a useless model is always equal to the class prevalence. For your dataset, that is 0.146. The baseline is built into the data itself, not into an arbitrary convention like 0.5. This makes PR AUC unusually honest. You do not need to run an experiment to know what random performance looks like. You just look at how rare the positive class is.
 
@@ -151,7 +151,7 @@ And now you can see that the "relative" floor is different. ROC AUC runs from 0.
 On the ROC scale, your model scores 0.702. The distance from floor to perfect is 0.5. Your model has covered 0.202 of that distance: about 40% of the way.
 On the PR scale, your model scores 0.275. The distance from floor to perfect is 0.854. Your model has covered 0.129 of that distance: about 15% of the way.
 
-The improvement over random is real, roughly 1.9 times on both scales. But the PR scale shows clearly that most of the distance between a useless classifier and a genuinely useful one has not been covered yet. ROC AUC at 0.702 did not show you that, because it was absorbing the majority class into the calculation and smoothing over the gap. And that is what a ROC AUC of 0.70 actually means when only 15% of the dataset is positive!
+The improvement over random is real, roughly 1.9 times on both scales. *But the PR scale shows clearly that most of the distance between a useless classifier and a genuinely useful one has not been covered yet.* ROC AUC at 0.702 did not show you that, because it was absorbing the majority class into the calculation and smoothing over the gap!
 
 ---
 
