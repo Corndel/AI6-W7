@@ -151,7 +151,7 @@ And now you can see that the "relative" floor is different. ROC AUC runs from 0.
 On the ROC scale, your model scores 0.702. The distance from floor to perfect is 0.5. Your model has covered 0.202 of that distance: about 40% of the way.
 On the PR scale, your model scores 0.275. The distance from floor to perfect is 0.854. Your model has covered 0.129 of that distance: about 15% of the way.
 
-The improvement over random is real, roughly 1.9 times on both scales. *But the PR scale shows clearly that most of the distance between a useless classifier and a genuinely useful one has not been covered yet.* ROC AUC at 0.702 did not show you that, because it was absorbing the majority class into the calculation and smoothing over the gap!
+The improvement over random is real, roughly 1.9 times on both scales. **But the PR scale shows clearly that most of the distance between a useless classifier and a genuinely useful one has not been covered yet.** ROC AUC at 0.702 did not show you that, because it was absorbing the majority class into the calculation and smoothing over the gap!
 
 ---
 
