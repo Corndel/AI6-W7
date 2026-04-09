@@ -154,3 +154,10 @@ Reinforcement of ideas introduced in earlier units or revisited in later ones.
 | K29 | Own role in relation to organisational governance, legal and ethical practice | Handoff discussion, accountability wrap-up, model card (Sections 10b, 13, 14) |
 | S11 | Regulatory, legal, ethical and governance issues at each stage | Feature selection, DPIA, Equality Act, throughout Sections 5-14 |
 | S29 | Create reports and presentations for stakeholder approval and handover | Three-slide executive summary, handoff discussion (Sections 13, 14) |
+
+---
+
+## GOING FURTHER
+
+| `GOING_FURTHER.md` | Learners who finish early, encounter a break, or crave more reading, are encouraged to look here |
+
