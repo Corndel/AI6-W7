@@ -49,7 +49,7 @@ As you lower the threshold, recall goes up (you catch more real cases) but preci
 
 The curve shows this tradeoff across every threshold at once. PR AUC is the area under that curve: a single number summarising how well the model balances precision and recall across all possible operating points.
 
-A perfect model has a PR AUC of 1.0. A model that predicts randomly has a PR AUC equal to the proportion of positive cases in the dataset: 0.15 for your attrition data. That is the baseline. Anything below 0.15 is worse than random.
+A perfect model has a PR AUC of 1.0. A model that predicts randomly has a PR AUC equal to the proportion of positive cases in the dataset: approximately 15% for your attrition data (well, actually: 0.146). That is the baseline. To be precise, anything below 0.146 is *worse than random*.
 
 This is the key difference from ROC AUC, where a random model scores 0.5 regardless of class balance. With PR AUC, the baseline shifts with the data. A PR AUC of 0.35 on a dataset with 15% positives is actually quite good. The same score on a balanced dataset would be weak.
 
@@ -137,13 +137,30 @@ print(f'ROC AUC: {roc_auc_score(y_test, y_prob_clean):.3f}')
 print(f'Baseline PR AUC (random model): {y_test.mean():.3f}')
 ```
 
-Compare the two numbers. Your ROC AUC is probably around 0.70. Your PR AUC will be lower in absolute terms, but the baseline is 0.15 rather than 0.5, so the gap above baseline tells a different story.
+Compare the two numbers. ROC AUC: 0.702. PR AUC: 0.275.
+
+The second number looks worse. But ask what a useless model would score on each scale.
+
+A model that predicts the majority class every time (stayed, stayed, stayed, for every employee) scores around 0.5 on ROC AUC. Not great, but not obviously broken. It looks like it has learned something.
+
+The same model scores 0.146 on PR AUC. That number will look familiar: it is the attrition rate in your dataset. This is not a coincidence, and it is worth understanding why.
+
+Imagine setting your threshold very low, so the model flags every employee as at risk. Recall is 1.0: you caught everyone who left. But precision is just 0.146: only 14.6% of the people you flagged actually left, because that is all there were. Now raise the threshold so high that the model flags nobody. Recall drops to 0. Precision is undefined. Everywhere in between, precision averages out to roughly the proportion of positives in the dataset, because that is the rate at which you encounter genuine cases no matter where you draw the line.
+
+The area under a curve that hovers around 0.146 across all thresholds is 0.146. So a model that has learned nothing about who is actually at risk will score exactly the attrition rate on the PR scale. The baseline is built into the data itself.
+
+This makes PR AUC unusually honest. You do not need to run an experiment to know what random performance looks like. You just look at how rare the positive class is.
+
+So the relative "floor" is different. ROC AUC runs from 0.5 (useless) to 1.0 (perfect). PR AUC runs from 0.146 (useless) to 1.0 (perfect).
+Your model scores 0.702 on a scale where the floor is 0.5. Your model scores 0.275 on a scale where the floor is 0.146. Relative to their respective floors, those two numbers are telling roughly the same story: about 1.9 times better than random. But the PR scale makes the remaining gap to perfect much more visible, and it does so without letting the majority class absorb the blame for the minority class going undetected.
+That is what a ROC AUC of 0.70 actually means when only 15% of the dataset is positive.
+
 
 ---
 
 ## What the limitations actually mean
 
-**No universal baseline.** A PR AUC of 0.40 means different things on different datasets. On your attrition data with 15% positives, 0.40 is well above random. On a fraud dataset with 0.1% positives, a baseline of 0.001 means 0.40 would be extraordinary. You always need to state the class prevalence alongside the PR AUC score.
+**No universal baseline.** A PR AUC of 0.40 means different things on different datasets. On your attrition data with ~15% positives, 0.40 is well above random. On a fraud dataset with 0.1% positives, a baseline of 0.001 means 0.40 would be extraordinary. You always need to state the class prevalence alongside the PR AUC score.
 
 **Sensitive to class distribution.** If your attrition rate changes over time (a recession, a new pay policy, a wave of resignations), the PR AUC of the same model will change even if the model itself has not changed. This is not a bug: it is the metric correctly reflecting that the problem has become harder or easier. But it means you cannot compare PR AUC values across different time periods without accounting for prevalence.
 
