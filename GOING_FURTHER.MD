@@ -73,7 +73,7 @@ For attrition prediction: your HR team cannot afford to have a retention convers
 
 To generate the PR curve for your attrition model:
 
-1. Run `predict_proba()` on your test set to get a probability for each employee.
+1. Run `predict_proba()` on your validation set to get a probability for each employee.
 2. Sort those probabilities from highest to lowest.
 3. At each probability value as a threshold, calculate precision and recall for that threshold.
 4. Plot recall on the x-axis and precision on the y-axis.
@@ -84,15 +84,15 @@ In practice, step 5 has a subtlety. The trapezoidal rule (connecting adjacent po
 ```python
 from sklearn.metrics import average_precision_score, precision_recall_curve, auc
 
-y_prob = model_clean.predict_proba(X_test_clean)[:, 1]
+y_prob = model_clean.predict_proba(X_val_clean)[:, 1]
 
 # Preferred: average_precision_score uses a weighted mean of precision
 # at each threshold, weighted by the change in recall
-ap = average_precision_score(y_test, y_prob)
+ap = average_precision_score(y_val, y_prob)
 print(f'Average Precision (PR AUC): {ap:.3f}')
 
 # Alternative: compute the curve first, then calculate AUC
-precision, recall, thresholds = precision_recall_curve(y_test, y_prob)
+precision, recall, thresholds = precision_recall_curve(y_val, y_prob)
 pr_auc = auc(recall, precision)
 print(f'PR AUC (trapezoidal): {pr_auc:.3f}')
 
@@ -106,23 +106,23 @@ print(f'PR AUC (trapezoidal): {pr_auc:.3f}')
 
 ## Running it on your model
 
-Open your notebook and add a cell after Section 4. You already have `y_prob`, `y_test`, and `model_clean` in memory.
+Open your notebook and add a cell after Section 6. You already have `y_prob`, `y_val`, `X_val_clean`, and `model_clean` in memory.
 
 ```python
 from sklearn.metrics import average_precision_score, precision_recall_curve
 import matplotlib.pyplot as plt
 
 # PR AUC for your clean model
-y_prob_clean = model_clean.predict_proba(X_test_clean)[:, 1]
-ap = average_precision_score(y_test, y_prob_clean)
+y_prob_clean = model_clean.predict_proba(X_val_clean)[:, 1]
+ap = average_precision_score(y_val, y_prob_clean)
 
 # Plot the curve
-precision, recall, _ = precision_recall_curve(y_test, y_prob_clean)
+precision, recall, _ = precision_recall_curve(y_val, y_prob_clean)
 
 fig, ax = plt.subplots(figsize=(7, 5))
 ax.plot(recall, precision, color='steelblue', lw=2, label=f'PR AUC = {ap:.3f}')
-ax.axhline(y=y_test.mean(), color='grey', linestyle='--',
-           label=f'Baseline (random) = {y_test.mean():.3f}')
+ax.axhline(y=y_val.mean(), color='grey', linestyle='--',
+           label=f'Baseline (random) = {y_val.mean():.3f}')
 ax.set_xlabel('Recall')
 ax.set_ylabel('Precision')
 ax.set_title('Precision-Recall Curve: Clean Model')
@@ -133,8 +133,8 @@ plt.tight_layout()
 plt.show()
 
 print(f'PR AUC:  {ap:.3f}')
-print(f'ROC AUC: {roc_auc_score(y_test, y_prob_clean):.3f}')
-print(f'Baseline PR AUC (random model): {y_test.mean():.3f}')
+print(f'ROC AUC: {roc_auc_score(y_val, y_prob_clean):.3f}')
+print(f'Baseline PR AUC (random model): {y_val.mean():.3f}')
 ```
 
 Compare the two numbers. ROC AUC: 0.702. PR AUC: 0.275.
@@ -184,3 +184,50 @@ For attrition prediction: use both ROC AUC and PR AUC during development. Presen
 - Deepchecks glossary: [PR AUC](https://deepchecks.com/glossary/pr-auc/) : clear and concise, the source this document builds on
 - Scikit-learn documentation: [sklearn.metrics.average_precision_score](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.average_precision_score.html)
 - Davis and Goadrich (2006): *The Relationship Between Precision-Recall and ROC Curves* : the original paper establishing why PR curves are more informative for imbalanced problems, can be found [HERE](https://ftp.cs.wisc.edu/machine-learning/shavlik-group/davis.icml06.pdf)(accessed April 2026).
+
+---
+
+## Scikit-learn Pipelines and ColumnTransformer
+
+The notebook encodes categorical features using `.cat.codes` before the split. This is a deliberate simplification so you can see what encoding does step by step.
+
+In a production workflow you would wrap preprocessing and modelling into a single scikit-learn Pipeline. This has two advantages: it prevents data leakage (the encoder is fitted on training data only) and it makes the workflow reproducible as a single object.
+
+Here is what the notebook's encoding and model training would look like as a Pipeline:
+
+```python
+from sklearn.pipeline import Pipeline
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OrdinalEncoder
+import xgboost as xgb
+
+# Identify column types (before any encoding)
+cat_cols = X_train.select_dtypes(include='object').columns.tolist()
+num_cols = X_train.select_dtypes(exclude='object').columns.tolist()
+
+preprocessor = ColumnTransformer([
+    ('cat', OrdinalEncoder(handle_unknown='use_encoded_value',
+                           unknown_value=-1), cat_cols),
+    ('num', 'passthrough', num_cols),
+])
+
+pipe = Pipeline([
+    ('preprocess', preprocessor),
+    ('model', xgb.XGBClassifier(
+        scale_pos_weight=pos_weight,
+        random_state=42,
+        eval_metric='logloss',
+        verbosity=0,
+    )),
+])
+
+pipe.fit(X_train, y_train)
+y_pred = pipe.predict(X_val)
+```
+
+The key difference: `preprocessor.fit()` happens inside `pipe.fit()`, which only sees `X_train`. When you call `pipe.predict(X_val)`, the same transformation is applied without re-fitting. That is the correct pattern.
+
+For more detail, see:
+
+- [Scikit-learn: Common pitfalls and recommended practices](https://scikit-learn.org/stable/common_pitfalls.html)
+- [Scikit-learn: Preprocessing data](https://scikit-learn.org/stable/modules/preprocessing.html)

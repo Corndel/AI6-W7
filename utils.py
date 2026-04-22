@@ -98,6 +98,7 @@ def plot_confusion_matrix(y_true, y_pred, title='Model'):
 
     ax.set_xlim(-0.5, 1.5)
     ax.set_ylim(-0.5, 1.5)
+    ax.invert_yaxis()
     ax.set_xticks([0, 1])
     ax.set_yticks([0, 1])
     ax.set_xticklabels(['Predicted\nstayed', 'Predicted\nleft'], fontsize=9)
