@@ -294,7 +294,7 @@ def plot_class_distribution(df, target='Attrition'):
     plt.tight_layout()
     plt.show()
 
-    print(f'For every 1 employee who left, {int((1 - rate) / rate)} stayed.')
+    print(f'For every 1 employee who left, {round((1 - rate) / rate)} stayed.')
     print('This imbalance is the first problem to solve.')
 
 
