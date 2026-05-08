@@ -187,11 +187,48 @@ For attrition prediction: use both ROC AUC and PR AUC during development. Presen
 
 ---
 
+## XGBoost native categorical handling
+
+The notebook encodes categorical features using `.cat.codes`, which converts each category to an integer. This is a workshop simplification so you can see what encoding does step by step, but it has a real cost: XGBoost treats those integers as continuous numeric values and may split on arbitrary codes (e.g. `JobRole <= 2`), losing the original categorical meaning.
+
+XGBoost can handle categorical features directly. Instead of converting to integer codes, keep the columns as pandas `category` dtype and tell XGBoost to use them as categories:
+
+```python
+# Instead of:
+for col in df.select_dtypes(include='object').columns:
+    df[col] = df[col].astype('category').cat.codes
+
+# Do this:
+for col in df.select_dtypes(include='object').columns:
+    df[col] = df[col].astype('category')
+```
+
+Then pass `enable_categorical=True` and use the `hist` tree method when creating the model:
+
+```python
+model = xgb.XGBClassifier(
+    scale_pos_weight=pos_weight,
+    tree_method='hist',
+    enable_categorical=True,
+    random_state=42,
+    eval_metric='logloss',
+    verbosity=0,
+)
+```
+
+With these settings, XGBoost splits on sets of categories rather than numeric thresholds, which is a better fit for features like JobRole, Department, BusinessTravel and OverTime.
+
+This is not a drop-in replacement. Changing how features are encoded changes the model's internal structure, which means every downstream output changes with it: confusion matrix values, ROC and PR AUC scores, the threshold comparison table, SHAP feature importances, and any metrics recorded in experiment tracking. The SHAP summary plot may also render differently, because the scikit-learn interface does not support SHAP computation directly with native categorical features (you need to convert to a DMatrix first). If you are switching an existing notebook or pipeline to native categorical handling, expect to re-validate every evaluation step, update stored outputs, and check that any documentation or model card still reflects the new results. This is normal for a change at the encoding level: it sits upstream of everything else.
+
+One thing to watch: when saving a model that uses native categorical features, use XGBoost's JSON or UBJSON format (`model.save_model('model.json')`). The default pickle/joblib serialisation does not always preserve categorical split information correctly.
+
+For full details, see [Categorical Data](https://xgboost.readthedocs.io/en/stable/tutorials/categorical.html) in the XGBoost documentation.
+
+---
+
 ## Scikit-learn Pipelines and ColumnTransformer
 
-The notebook encodes categorical features using `.cat.codes` before the split. This is a deliberate simplification so you can see what encoding does step by step.
-
-In a production workflow you would wrap preprocessing and modelling into a single scikit-learn Pipeline. This has two advantages: it prevents data leakage (the encoder is fitted on training data only) and it makes the workflow reproducible as a single object.
+The native categorical approach above is a good step forward from `.cat.codes`, but in a production workflow you would go further and wrap preprocessing and modelling into a single scikit-learn Pipeline. This has two advantages: it prevents data leakage (the encoder is fitted on training data only) and it makes the workflow reproducible as a single object.
 
 Here is what the notebook's encoding and model training would look like as a Pipeline:
 
@@ -231,3 +268,15 @@ For more detail, see:
 
 - [Scikit-learn: Common pitfalls and recommended practices](https://scikit-learn.org/stable/common_pitfalls.html)
 - [Scikit-learn: Preprocessing data](https://scikit-learn.org/stable/modules/preprocessing.html)
+
+---
+
+## Refitting on all development data
+
+In this workshop, `model_clean` is trained on `X_train` and evaluated on `X_val` while modelling decisions are made. The held-out test set `X_test_final` is then used once at the end for one honest score.
+
+In a production workflow, once the threshold, feature list and model settings have been chosen, you would usually refit the final model on the combined development data (`X_train` + `X_val`) before running the final test evaluation. This gives the final model access to all the data that informed your decisions, while still keeping `X_test_final` untouched for one honest final score.
+
+This is the same idea as scikit-learn's `GridSearchCV(refit=True)`, which refits the best estimator on the full development set after cross-validation and model selection.
+
+For more detail, see [GridSearchCV](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html) in the scikit-learn documentation.
